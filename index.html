@@ -1,772 +1,519 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>EscalaAi - Sorteador de Times</title>
-
-  <!-- Bootstrap -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
+  <meta charset="UTF-8" />
+  <title>Sorteio de Times</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
-    :root {
-      --bg: #f3f4f8;
-      --card: #ffffff;
-      --text: #1f2937;
-      --muted: #6b7280;
-      --primary: #2563eb;
-      --primary-soft: #dbeafe;
-      --border: #e5e7eb;
-      --shadow: 0 10px 25px rgba(0,0,0,.06);
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #0b1020;
+      color: #f5f5f5;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 10px;
     }
-    [data-theme="dark"] {
-      --bg: #0f172a;
-      --card: #111827;
-      --text: #e5e7eb;
-      --muted: #94a3b8;
-      --primary: #60a5fa;
-      --primary-soft: #1d4ed855;
-      --border: #1f2937;
-      --shadow: 0 10px 25px rgba(0,0,0,.25);
+
+    .container {
+      background: #161b30;
+      width: 100%;
+      max-width: 900px;
+      border-radius: 10px;
+      padding: 16px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.5);
     }
-    body { background: var(--bg); color: var(--text); }
-    .card { border: 1px solid var(--border); background: var(--card); box-shadow: var(--shadow); border-radius: 16px; }
-    .h1, .h2, .h3, .h4, .h5, .h6,
-    h1, h2, h3, h4, h5, h6 { color: var(--text); }
-    .display-1, .display-2, .display-3, .display-4, .display-5, .display-6 { color: var(--text); }
-    .form-label { color: var(--text); }
-    .form-control, .form-select {
-      background: var(--card);
-      color: var(--text);
-      border-color: var(--border);
+
+    h1 {
+      text-align: center;
+      margin-bottom: 12px;
+      color: #00e676;
+      font-size: 1.4rem;
     }
-    .form-control::placeholder { color: var(--muted); }
-    .form-control:focus, .form-select:focus { border-color: var(--primary); box-shadow: 0 0 0 .15rem rgba(37,99,235,.25); }
-    .badge-player { font-size: .95rem; padding: .55rem .7rem; border-radius: 999px; }
-    .muted { color: var(--muted); }
-    .team-title { letter-spacing: .3px; }
-    .sticky-actions { position: sticky; top: 12px; z-index: 5; }
-    .player-row:hover { background: rgba(37,99,235,.08); border-radius: 10px; }
-    .small-help { font-size: .9rem; }
-    .btn-primary { background: var(--primary); border-color: var(--primary); }
-    .btn-outline-primary { color: #ffffff; border-color: #060809; }
-    .btn-outline-primary:hover { background: var(--primary); color: #fff; }
-    .app-hero { background: linear-gradient(135deg, var(--primary) 0%, #10b981 100%); color: #fff; border-radius: 18px; padding: 16px 20px; box-shadow: var(--shadow); }
-    .app-hero .muted { color: rgba(255,255,255,.8); }
-    .badge.soft { background: var(--primary-soft); color: var(--primary); border: 1px solid var(--border); }
-    .icon-btn i { width: 18px; height: 18px; }
-    [data-theme="dark"] .form-check-label { color: #f8fafc; }
-    [data-theme="dark"] #kickoffInfo { color: var(--text); }
+
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .col {
+      flex: 1;
+      min-width: 100%;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 0.85rem;
+      color: #cfd8dc;
+    }
+
+    select, input, textarea, button {
+      width: 100%;
+      padding: 8px 10px;
+      border-radius: 5px;
+      border: 1px solid #263238;
+      background: #1c2331;
+      color: #eceff1;
+      font-size: 0.9rem;
+    }
+
+    textarea {
+      min-height: 110px;
+      resize: vertical;
+    }
+
+    button {
+      cursor: pointer;
+      background: #00e676;
+      color: #000;
+      font-weight: bold;
+      border: none;
+      transition: background 0.2s;
+    }
+
+    button:hover {
+      background: #00c853;
+    }
+
+    .btn-secondary {
+      background: #2979ff;
+      color: #fff;
+    }
+
+    .btn-secondary:hover {
+      background: #1565c0;
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 1px solid #00e676;
+      color: #00e676;
+    }
+
+    .btn-outline:hover {
+      background: rgba(0,230,118,0.1);
+    }
+
+    .btn-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .btn-group button {
+      flex: 1;
+      min-width: 120px;
+    }
+
+    .btn-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+
+    .times-container {
+      margin-top: 16px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .time-card {
+      background: #1e2438;
+      border-radius: 8px;
+      padding: 10px 12px;
+      min-width: 160px;
+      flex: 1;
+    }
+
+    .time-card h3 {
+      margin-bottom: 6px;
+      color: #ffca28;
+      font-size: 0.95rem;
+    }
+
+    .time-card ul {
+      list-style: none;
+      padding-left: 10px;
+      font-size: 0.9rem;
+    }
+
+    .time-card li::before {
+      content: "• ";
+      color: #90caf9;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      background: #263238;
+      color: #fff;
+      margin-left: 5px;
+    }
+
+    .footer-info {
+      margin-top: 12px;
+      font-size: 0.75rem;
+      color: #b0bec5;
+      text-align: center;
+    }
+
+    #contadorSobras {
+      margin-top: 4px;
+      font-size: 0.85rem;
+      color: #ff5252;
+      font-weight: bold;
+    }
+
+    @media (min-width: 600px) {
+      .col-half {
+        min-width: calc(50% - 5px);
+      }
+      h1 {
+        font-size: 1.6rem;
+      }
+      textarea {
+        min-height: 130px;
+      }
+    }
   </style>
 </head>
-
-<body class="py-4" data-theme="light">
+<body>
   <div class="container">
-    <div class="row g-4">
-      <div class="col-12">
-        <div class="app-hero d-flex flex-wrap align-items-center justify-content-between gap-3">
-          <div>
-            <div class="d-flex align-items-center gap-2">
-              <i data-lucide="sparkles"></i>
-              <h1 class="h4 mb-0">EscalaAi</h1>
-              <span class="badge soft">Futebol</span>
-            </div>
-            <div class="muted">Digite os jogadores e sorteie Time 1, Time 2 e Time 3 (se sobrar).</div>
-          </div>
-          <div class="d-flex gap-2 flex-wrap align-items-start">
-            <button class="btn btn-outline-secondary icon-btn" id="btnResetAll"><i data-lucide="eraser"></i> Limpar</button>
-            <div class="d-flex flex-column gap-2">
-              <button class="btn btn-outline-primary icon-btn" id="btnCopy"><i data-lucide="copy"></i> Copiar times</button>
-              <button class="btn btn-outline-primary icon-btn" id="btnCopyPretty"><i data-lucide="list"></i> Copiar em lista</button>
-            </div>
-            <button class="btn btn-outline-light icon-btn" id="btnToggleTheme"><i data-lucide="moon"></i> Tema</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Partida em andamento -->
-      <div class="col-12">
-        <div class="card p-3 p-md-4">
-          <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
-            <div>
-              <h2 class="h5 mb-1">Partida em andamento</h2>
-              <div class="muted small">Cronometro e placar rapido para Times 1 e 2.</div>
-            </div>
-            <div class="d-flex flex-wrap align-items-center gap-3">
-              <div class="text-center">
-                <div class="muted small">Placar</div>
-                <div class="d-flex align-items-center gap-2">
-                  <button class="btn btn-outline-secondary btn-sm" data-score-btn="t1-dec">-</button>
-                  <div class="display-6 fw-semibold" id="scoreT1">0</div>
-                  <span class="muted">x</span>
-                  <div class="display-6 fw-semibold" id="scoreT2">0</div>
-                  <button class="btn btn-outline-secondary btn-sm" data-score-btn="t2-dec">-</button>
-                </div>
-                <div class="d-flex gap-2 justify-content-center mt-2">
-                  <button class="btn btn-primary btn-sm icon-btn" data-score-btn="t1-inc"><i data-lucide="plus"></i> Time 1</button>
-                  <button class="btn btn-primary btn-sm icon-btn" data-score-btn="t2-inc"><i data-lucide="plus"></i> Time 2</button>
-                  <button class="btn btn-outline-danger btn-sm icon-btn" data-score-btn="reset"><i data-lucide="refresh-cw"></i> Reset</button>
-                </div>
-              </div>
-              <div class="vr d-none d-md-block" style="height:60px"></div>
-              <div>
-                <div class="d-flex align-items-center gap-2 mb-2">
-                  <input type="number" class="form-control" id="timerMinutes" min="1" value="10" style="max-width:100px">
-                  <span class="muted small">minutos</span>
-                </div>
-                <div class="display-6 fw-semibold" id="timerDisplay">10:00</div>
-                <div class="d-flex flex-wrap gap-2 mt-2">
-                  <button class="btn btn-success btn-sm icon-btn" id="btnTimerStart"><i data-lucide="play"></i> Iniciar</button>
-                  <button class="btn btn-warning btn-sm icon-btn" id="btnTimerPause"><i data-lucide="pause"></i> Pausar</button>
-                  <button class="btn btn-outline-secondary btn-sm icon-btn" id="btnTimerReset"><i data-lucide="rotate-ccw"></i> Resetar</button>
-                  <button class="btn btn-outline-danger btn-sm icon-btn" id="btnTimerMute"><i data-lucide="volume-x"></i> Parar som</button>
-                </div>
-                <div class="muted small mt-2">Bipe fica continuo ao zerar ate clicar em Pausar/Parar som.</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Config -->
-      <div class="col-12 col-lg-5">
-        <div class="card p-3 p-md-4">
-          <h2 class="h5 mb-3">Configuracao</h2>
-
-          <div class="row g-3">
-            <div class="col-12">
-              <label class="form-label">Tipo de jogo</label>
-              <select class="form-select" id="gameType">
-                <option value="futsal" selected>Futsal (4 linha + 1 gol)</option>
-                <option value="society">Society (5 linha + 1 gol)</option>
-                <option value="campo">Campo (10 linha + 1 gol)</option>
-              </select>
-              <div class="small-help muted mt-1">Muda o limite de jogadores de linha por time.</div>
-            </div>
-
-            <div class="col-6">
-              <label class="form-label">Total de jogadores</label>
-              <input type="number" class="form-control" id="totalPlayers" min="1" value="14">
-              <div class="small-help muted mt-1">Inclui goleiros.</div>
-            </div>
-
-            <div class="col-6">
-              <label class="form-label">Quantidade de goleiros</label>
-              <input type="number" class="form-control" id="totalKeepers" min="0" value="2">
-              <div class="small-help muted mt-1">Ex: 2 goleiros no total.</div>
-            </div>
-
-            <div class="col-6">
-              <label class="form-label">Jogadores de linha por time</label>
-              <input type="number" class="form-control" id="teamSize" min="1" value="5">
-              <div class="small-help muted mt-1">Nao conta goleiro. Ex: 5 = 5 + goleiro.</div>
-            </div>
-
-            <div class="col-6">
-              <label class="form-label">Pessoas por linha (visual)</label>
-              <input type="number" class="form-control" id="perRow" min="1" max="12" placeholder="auto">
-              <div class="small-help muted mt-1">Ajusta as colunas; se vazio usa um padrao automatico.</div>
-            </div>
-
-            <div class="col-12">
-              <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="oneKeeperEach" checked>
-                <label class="form-check-label" for="oneKeeperEach">
-                  Priorizar 1 goleiro no Time 1 e 1 no Time 2 (se possivel)
-                </label>
-              </div>
-            </div>
-
-            <div class="col-12 d-grid">
-              <button class="btn btn-primary" id="btnGenerateFields">Gerar campos de jogadores</button>
-            </div>
-
-            <div class="col-12">
-              <div class="alert alert-light border mb-0 small">
-                <div class="fw-semibold mb-1">Como funciona</div>
-                <ul class="mb-0">
-                  <li>Preencha os nomes (marque quem e goleiro).</li>
-                  <li>O sorteio monta Time 1 e Time 2 com o limite de <b>jogadores de linha</b>.</li>
-                  <li>Goleiro nao conta nessa vaga de linha.</li>
-                  <li>Se sobrar gente, vai para o <b>Time 3</b>.</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Lista -->
-        <div class="card p-3 p-md-4 mt-4">
-          <div class="d-flex align-items-center justify-content-between gap-2">
-            <h2 class="h5 mb-0">Jogadores</h2>
-            <div class="d-flex gap-2">
-              <button class="btn btn-outline-secondary btn-sm" id="btnAutoMark">Auto-marcar goleiros</button>
-              <button class="btn btn-success btn-sm icon-btn" id="btnDraw"><i data-lucide="shuffle"></i> Sortear</button>
-            </div>
-          </div>
-          <div class="muted small mt-1">Dica: voce pode gerar campos e preencher rapidinho.</div>
-
-          <hr class="my-3">
-
-          <div id="playersContainer" class="vstack gap-2">
-            <div class="muted">Clique em <b>Gerar campos de jogadores</b> para comecar.</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Resultados -->
-      <div class="col-12 col-lg-7">
-        <div class="sticky-actions">
-          <div class="card p-3 p-md-4">
-            <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
-              <div>
-                <h2 class="h5 mb-0">Times sorteados</h2>
-                <div class="muted small">Goleiro aparece com [GK]</div>
-              </div>
-              <div class="d-flex gap-2">
-                <button class="btn btn-outline-primary" id="btnRedraw">Sortear de novo</button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="row g-4 mt-0" id="teamsWrapper">
-          <div class="col-12">
-            <div class="card p-3 p-md-4 h-100">
-              <h3 class="h6 team-title mb-3">Times</h3>
-              <div class="muted">Sem sorteio ainda.</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="row g-4 mt-0">
-          <div class="col-12 col-md-6">
-            <div class="card p-3 p-md-4 h-100">
-              <h3 class="h6 team-title mb-3">Quem inicia</h3>
-              <div id="kickoffInfo" class="muted">Sorteie os times para descobrir quem fica com a bola e quem escolhe campo.</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-12 mt-4">
-          <div class="alert alert-info border-0 mb-0">
-            <div class="fw-semibold">Regras usadas no sorteio</div>
-            <div class="small">
-              1) Embaralha jogadores. 2) Se marcado, tenta colocar 1 goleiro nos primeiros times.
-              3) Preenche cada time ate o limite de jogadores de linha (goleiro nao conta).
-              4) Se faltar espaco, cria novos times automaticamente.
-            </div>
-          </div>
-        </div>
-      </div>
-      <!-- /Resultados -->
-
+    <button onclick="window.location.href='cronometroeplacar.html'" style="width:100%;margin-bottom:16px;padding:12px 0;font-size:1.1rem;background:#2979ff;color:#fff;border:none;border-radius:8px;box-shadow:0 2px 8px #0004;cursor:pointer;font-weight:bold;">Ir para Cronômetro e Placar</button>
+    <div id="notificacao" style="display:none;position:fixed;top:24px;left:50%;transform:translateX(-50%);background:#222c44;color:#fff;padding:14px 28px;border-radius:8px;box-shadow:0 2px 16px #0008;font-size:1.05rem;z-index:9999;min-width:220px;text-align:center;transition:opacity 0.3s;opacity:0;"></div>
+    <h1 style="text-align:center;color:#00e676;margin-bottom:12px;font-size:1.7rem;">Sorteio de Times</h1>
+    <div style="width:100%;display:flex;justify-content:center;margin-bottom:18px;">
+      <img src="goleio1.png" alt="Logo Goleio" style="max-width:320px;width:100%;height:auto;border-radius:12px;box-shadow:0 2px 16px #0006;">
     </div>
+    <div class="row">
+      <div class="col col-half">
+        <label for="modalidade">Modalidade</label>
+        <select id="modalidade">
+          <option value="futsal">FUTSAL</option>
+          <option value="society">SOCYET</option>
+          <option value="campo">CAMPO</option>
+        </select>
+      </div>
+      <div class="col col-half">
+        <label for="jogadoresPorTime">Jogadores por time</label>
+        <input type="number" id="jogadoresPorTime" min="1" value="5" />
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <label for="textoBruto">Texto completo da lista (cole a mensagem do grupo aqui)</label>
+        <textarea id="textoBruto" placeholder="Cole aqui a mensagem com:
+GOLEIROS
+ATLETAS DE ALTO NÍVEL
+LISTA DE ESPERA
+"></textarea>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <div class="btn-group">
+          <button id="btnProcessar">Processar lista</button>
+          <button id="btnSortear">Sortear Times</button>
+          <button id="btnCopiar" class="btn-outline btn-icon">
+            <i data-lucide="clipboard"></i><span>Copiar times</span>
+          </button>
+          <button id="btnModelo" class="btn-outline btn-icon">
+            <i data-lucide="clipboard-list"></i><span>Modelo de lista</span>
+          </button>
+          <button id="btnLimpar" class="btn-secondary">Limpar</button>
+        </div>
+        <p id="contadorSobras">Jogadores sobrando: 0</p>
+      </div>
+    </div>
+    <div id="resultado" class="times-container"></div>
+    <p class="footer-info">
+      O app lê “GOLEIROS” e “ATLETAS DE ALTO NÍVEL” e ignora a lista de espera.
+    </p>
   </div>
 
+  <!-- Lucide Icons CDN (opcional) -->
   <script src="https://unpkg.com/lucide@latest"></script>
+
   <script>
-    // ---------- Helpers ----------
-    function shuffle(arr) {
-      const a = [...arr];
-      for (let i = a.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [a[i], a[j]] = [a[j], a[i]];
+        // Notificação visual personalizada
+        function mostrarNotificacao(msg, tempo=3000) {
+          const notif = document.getElementById('notificacao');
+          notif.textContent = msg;
+          notif.style.display = 'block';
+          notif.style.opacity = '1';
+          clearTimeout(mostrarNotificacao._timeout);
+          mostrarNotificacao._timeout = setTimeout(() => {
+            notif.style.opacity = '0';
+            setTimeout(() => { notif.style.display = 'none'; }, 350);
+          }, tempo);
+        }
+    // inicializa ícones Lucide [web:80][web:83]
+    if (window.lucide) {
+      document.addEventListener("DOMContentLoaded", () => {
+        lucide.createIcons();
+      });
+    }
+
+    const modalidadeSelect = document.getElementById("modalidade");
+    const jogadoresPorTimeInput = document.getElementById("jogadoresPorTime");
+    const textoBrutoTextarea = document.getElementById("textoBruto");
+    const btnProcessar = document.getElementById("btnProcessar");
+    const btnSortear = document.getElementById("btnSortear");
+    const btnLimpar = document.getElementById("btnLimpar");
+    const btnCopiar = document.getElementById("btnCopiar");
+    const btnModelo = document.getElementById("btnModelo");
+    const resultadoDiv = document.getElementById("resultado");
+    const contadorSobras = document.getElementById("contadorSobras");
+
+    let goleirosProcessados = [];
+    let jogadoresProcessados = [];
+    let ultimoTextoCopiavel = "";
+
+    const MODELO_LISTA = `✅ LISTA DOS CONFIRMADOS
+Dia XX/XX/XXXX
+
+🥅 GOLEIROS
+
+🧤-
+🧤-
+
+ATLETAS DE ALTO NÍVEL
+
+1️⃣-
+2️⃣-
+3️⃣-
+4️⃣-
+5️⃣-
+6️⃣-
+7️⃣-
+🎱-
+9️⃣-
+🔟-
+1️⃣1️⃣-
+1️⃣2️⃣-
+1️⃣3️⃣-
+1️⃣4️⃣-
+1️⃣5️⃣-
+
+LISTA DE ESPERA
+1.
+2.
+3.
+4.
+5.`;
+
+    modalidadeSelect.addEventListener("change", () => {
+      const mod = modalidadeSelect.value;
+      if (mod === "futsal") jogadoresPorTimeInput.value = 5;
+      if (mod === "society") jogadoresPorTimeInput.value = 7;
+      if (mod === "campo") jogadoresPorTimeInput.value = 11;
+    });
+
+    function embaralhar(array) {
+      let currentIndex = array.length;
+      while (currentIndex !== 0) {
+        const randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex--;
+        [array[currentIndex], array[randomIndex]] =
+          [array[randomIndex], array[currentIndex]];
       }
-      return a;
+      return array;
     }
 
-    function el(tag, className, html) {
-      const e = document.createElement(tag);
-      if (className) e.className = className;
-      if (html !== undefined) e.innerHTML = html;
-      return e;
+    // limpeza mais agressiva para tirar emojis/números e sobrar só o nome
+    function limparLinha(linha) {
+      return linha
+        .replace(/^[^A-Za-zÀ-ÿ]+/g, "")          // remove símbolos/emoji no começo
+        .replace(/[0-9]+[º°]?\s*[-–.]?\s*/g, "") // remove 1-, 10-, 1º-, etc.
+        .replace(/[🎱🥅🧤✅]/g, "")              // remove emojis customizados
+        .replace(/[•\-–]+/g, " ")                // bullets e traços
+        .trim();
     }
 
-    function clamp(n, min, max) {
-      return Math.max(min, Math.min(max, n));
+    function processarLista() {
+      const texto = textoBrutoTextarea.value;
+      if (!texto.trim()) {
+        mostrarNotificacao('Cole a lista completa primeiro.');
+        return;
+      }
+
+      const linhas = texto.split("\n"); // quebra em linhas [web:66][web:69][web:72]
+
+      let secao = "none"; // none | goleiros | jogadores | espera
+      const goleiros = [];
+      const jogadores = [];
+
+      for (let bruta of linhas) {
+        let linha = bruta.trim();
+        if (!linha) continue;
+
+        const upper = linha.toUpperCase();
+
+        if (upper.includes("LISTA DE ESPERA")) {
+          secao = "espera";
+          continue;
+        }
+        if (upper.includes("ATLETAS DE ALTO NÍVEL")) {
+          secao = "jogadores";
+          continue;
+        }
+        if (upper.includes("GOLEIRO") || upper.includes("GOLEIROS")) {
+          secao = "goleiros";
+          continue;
+        }
+
+        if (secao === "espera") {
+          continue;
+        }
+
+        const nomeLimpo = limparLinha(linha);
+        // garante que tenha pelo menos uma letra (evita quadradinhos) [web:61][web:69]
+        if (!/[A-Za-zÀ-ÿ]/.test(nomeLimpo)) continue;
+
+        if (secao === "goleiros") {
+          goleiros.push(nomeLimpo);
+        } else if (secao === "jogadores") {
+          jogadores.push(nomeLimpo);
+        }
+      }
+
+      goleirosProcessados = goleiros;
+      jogadoresProcessados = jogadores;
+
+      mostrarNotificacao(
+        'Processado!<br>Goleiros: ' +
+        goleirosProcessados.length +
+        '<br>Jogadores de linha: ' +
+        jogadoresProcessados.length
+      );
     }
 
-    // Presets para cada tipo de jogo (jogadores de linha)
-    const GAME_PRESETS = {
-      futsal: 4,
-      society: 5,
-      campo: 10
-    };
+    function sortearTimes() {
+      const goleiros = [...goleirosProcessados];
+      let jogadores = [...jogadoresProcessados];
+      const porTime = parseInt(jogadoresPorTimeInput.value, 10);
 
-    // ---------- DOM ----------
-    const gameType = document.getElementById("gameType");
-    const totalPlayers = document.getElementById("totalPlayers");
-    const totalKeepers = document.getElementById("totalKeepers");
-    const teamSize = document.getElementById("teamSize");
-    const perRow = document.getElementById("perRow");
-    const oneKeeperEach = document.getElementById("oneKeeperEach");
+      if (goleiros.length === 0 && jogadores.length === 0) {
+        mostrarNotificacao("Nenhum jogador processado. Clique em 'Processar lista' primeiro.");
+        return;
+      }
+      if (!porTime || porTime <= 0) {
+        mostrarNotificacao('Informe a quantidade de jogadores por time.');
+        return;
+      }
 
-    const btnGenerateFields = document.getElementById("btnGenerateFields");
-    const btnAutoMark = document.getElementById("btnAutoMark");
-    const btnDraw = document.getElementById("btnDraw");
-    const btnRedraw = document.getElementById("btnRedraw");
-    const btnCopy = document.getElementById("btnCopy");
-    const btnCopyPretty = document.getElementById("btnCopyPretty");
-    const btnResetAll = document.getElementById("btnResetAll");
-    const btnToggleTheme = document.getElementById("btnToggleTheme");
+      const totalJogadores = goleiros.length + jogadores.length;
+      const numTimes = Math.ceil(totalJogadores / porTime);
 
-    const playersContainer = document.getElementById("playersContainer");
+      jogadores = embaralhar(jogadores);
 
-    const teamsWrapper = document.getElementById("teamsWrapper");
-    const kickoffInfo = document.getElementById("kickoffInfo");
-    const timerMinutes = document.getElementById("timerMinutes");
-    const timerDisplay = document.getElementById("timerDisplay");
-    const btnTimerStart = document.getElementById("btnTimerStart");
-    const btnTimerPause = document.getElementById("btnTimerPause");
-    const btnTimerReset = document.getElementById("btnTimerReset");
-    const btnTimerMute = document.getElementById("btnTimerMute");
-    const scoreT1 = document.getElementById("scoreT1");
-    const scoreT2 = document.getElementById("scoreT2");
+      const times = [];
+      for (let i = 0; i < numTimes; i++) {
+        times.push([]);
+      }
 
-    let lastPlayersSnapshot = null; // para "sortear de novo" sem perder inputs
+      goleiros.forEach((g, idx) => {
+        const timeIndex = idx % numTimes;
+        times[timeIndex].push(g + " (GOL)");
+      });
 
-    // Timer state
-    let timerId = null;
-    let remainingMs = 0;
-    let beepCtx = null;
-    let beepOsc = null;
-    const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
-    let currentTheme = localStorage.getItem("escalaai_theme") || (prefersDark ? "dark" : "light");
+      let iJog = 0;
+      for (let t = 0; t < numTimes; t++) {
+        while (times[t].length < porTime && iJog < jogadores.length) {
+          times[t].push(jogadores[iJog]);
+          iJog++;
+        }
+      }
 
-    function startBeepLoop() {
+      let sobrando = jogadores.length - iJog;
+      if (sobrando < 0) sobrando = 0;
+      contadorSobras.textContent = "Jogadores sobrando: " + sobrando;
+
+      let texto = "";
+      resultadoDiv.innerHTML = "";
+      times.forEach((time, index) => {
+        if (time.length === 0) return;
+
+        const nomeTime = `Time ${index + 1}`;
+        texto += nomeTime + " (" + time.length + " jogadores):\n";
+        const card = document.createElement("div");
+        card.className = "time-card";
+
+        const titulo = document.createElement("h3");
+        titulo.textContent = nomeTime;
+        const badge = document.createElement("span");
+        badge.className = "badge";
+        badge.textContent = `${time.length} jogadores`;
+        titulo.appendChild(badge);
+
+        const lista = document.createElement("ul");
+        time.forEach(j => {
+          texto += " - " + j + "\n";
+          const li = document.createElement("li");
+          li.textContent = j;
+          lista.appendChild(li);
+        });
+        texto += "\n";
+
+        card.appendChild(titulo);
+        card.appendChild(lista);
+        resultadoDiv.appendChild(card);
+      });
+
+      if (sobrando > 0) {
+        texto += `Jogadores sobrando: ${sobrando}\n`;
+      }
+
+      ultimoTextoCopiavel = texto.trim();
+    }
+
+    async function copiarTimes() {
+      if (!ultimoTextoCopiavel) {
+        mostrarNotificacao('Nenhum sorteio para copiar. Sorteie os times primeiro.');
+        return;
+      }
       try {
-        beepCtx = new (window.AudioContext || window.webkitAudioContext)();
-        beepOsc = beepCtx.createOscillator();
-        const gain = beepCtx.createGain();
-        beepOsc.type = "sine";
-        beepOsc.frequency.value = 880;
-        gain.gain.setValueAtTime(0.08, beepCtx.currentTime);
-        beepOsc.connect(gain).connect(beepCtx.destination);
-        beepOsc.start();
-      } catch (_) {
-        // ignora se o navegador bloquear audio
+        await navigator.clipboard.writeText(ultimoTextoCopiavel); // Clipboard API [web:45][web:78]
+        mostrarNotificacao('Times copiados para a área de transferência!');
+      } catch (err) {
+        console.error(err);
+        mostrarNotificacao('Não foi possível copiar os times. Verifique as permissões do navegador.');
       }
     }
 
-    function stopBeepLoop() {
-      if (beepOsc) {
-        beepOsc.stop();
-        beepOsc.disconnect();
-        beepOsc = null;
-      }
-      if (beepCtx) {
-        beepCtx.close();
-        beepCtx = null;
+    async function copiarModeloLista() {
+      try {
+        await navigator.clipboard.writeText(MODELO_LISTA); // copia modelo [web:45][web:78]
+        mostrarNotificacao('Modelo de lista copiado! Cole no grupo e preencha os nomes.');
+      } catch (err) {
+        console.error(err);
+        mostrarNotificacao('Não foi possível copiar o modelo. Verifique as permissões do navegador.');
       }
     }
 
-    function setTheme(theme) {
-      currentTheme = theme === "dark" ? "dark" : "light";
-      document.body.setAttribute("data-theme", currentTheme);
-      localStorage.setItem("escalaai_theme", currentTheme);
-      const icon = currentTheme === "dark" ? "sun" : "moon";
-      const toggleIcon = btnToggleTheme.querySelector("i");
-      if (toggleIcon) toggleIcon.setAttribute("data-lucide", icon);
-      if (window.lucide) window.lucide.createIcons();
-    }
+    btnProcessar.addEventListener("click", processarLista);
+    btnSortear.addEventListener("click", sortearTimes);
+    btnCopiar.addEventListener("click", copiarTimes);
+    btnModelo.addEventListener("click", copiarModeloLista);
 
-    // ---------- UI: Fields ----------
-    function applyGamePreset() {
-      const preset = GAME_PRESETS[gameType.value] || 5;
-      teamSize.value = preset;
-      // tenta manter goleiros proporcional: 1 por time base (2 times)
-      const suggestedKeepers = Math.min(Math.max(1, Math.ceil((parseInt(totalPlayers.value || "0", 10) || 0) / (preset + 1))), 6);
-      totalKeepers.value = suggestedKeepers;
-    }
-
-    function renderPlayerFields() {
-      const existingPlayers = [...playersContainer.querySelectorAll(".player-row")].map((row) => {
-        const nameInput = row.querySelector("input.form-control");
-        const gkCheck = row.querySelector("input.form-check-input");
-        return {
-          name: nameInput ? nameInput.value : "",
-          isGK: gkCheck ? gkCheck.checked : false
-        };
-      });
-
-      const n = Math.max(1, parseInt(totalPlayers.value || "0", 10));
-      let gk = Math.max(0, parseInt(totalKeepers.value || "0", 10));
-      gk = clamp(gk, 0, n);
-      totalKeepers.value = gk;
-
-      playersContainer.innerHTML = "";
-      for (let i = 0; i < n; i++) {
-        const row = el("div", "row g-2 align-items-center py-2 px-2 player-row");
-
-        const colName = el("div", "col-12 col-md-7");
-        const input = el("input", "form-control");
-        input.type = "text";
-        input.placeholder = `Jogador ${i + 1}`;
-        input.dataset.idx = i;
-
-        const colGK = el("div", "col-6 col-md-3");
-        const checkWrap = el("div", "form-check");
-        const chk = el("input", "form-check-input");
-        chk.type = "checkbox";
-        chk.id = `gk_${i}`;
-        chk.dataset.idx = i;
-
-        const previous = existingPlayers[i];
-        if (previous) {
-          input.value = previous.name;
-          chk.checked = previous.isGK;
-        } else if (i < gk) {
-          // pre-marca goleiros se nao havia dado anterior
-          chk.checked = true;
-        }
-
-        const lbl = el("label", "form-check-label", "Goleiro");
-        lbl.htmlFor = chk.id;
-        checkWrap.appendChild(chk);
-        checkWrap.appendChild(lbl);
-        colGK.appendChild(checkWrap);
-
-        const colTag = el("div", "col-6 col-md-2 text-md-end");
-        colTag.appendChild(el("span", "badge text-bg-light", `#${i + 1}`));
-
-        colName.appendChild(input);
-        row.appendChild(colName);
-        row.appendChild(colGK);
-        row.appendChild(colTag);
-
-        playersContainer.appendChild(row);
-      }
-    }
-
-    function getPlayersFromFields() {
-      const inputs = playersContainer.querySelectorAll("input.form-control");
-      const checks = playersContainer.querySelectorAll("input.form-check-input");
-
-      const players = [];
-      inputs.forEach((inp) => {
-        const idx = inp.dataset.idx;
-        const name = (inp.value || "").trim();
-        const chk = [...checks].find(c => c.dataset.idx === idx);
-        const isGK = chk ? chk.checked : false;
-
-        if (name) players.push({ name, isGK });
-      });
-
-      // remove duplicados por nome (mantem o primeiro)
-      const seen = new Set();
-      const unique = [];
-      for (const p of players) {
-        const key = p.name.toLowerCase();
-        if (!seen.has(key)) {
-          seen.add(key);
-          unique.push(p);
-        }
-      }
-      return unique;
-    }
-
-    function autoMarkKeepers() {
-      const n = Math.max(1, parseInt(totalPlayers.value || "0", 10));
-      let gk = Math.max(0, parseInt(totalKeepers.value || "0", 10));
-      gk = clamp(gk, 0, n);
-      totalKeepers.value = gk;
-
-      const checks = playersContainer.querySelectorAll("input.form-check-input");
-      checks.forEach((chk, i) => chk.checked = i < gk);
-    }
-
-    // ---------- Render Teams ----------
-    function getPerRowValue(teamPlayers) {
-      const raw = parseInt(perRow.value, 10);
-      const fallback = teamPlayers && teamPlayers.length > 0
-        ? Math.min(4, Math.max(2, Math.ceil(teamPlayers.length / 2)))
-        : 3;
-      const line = clamp(isNaN(raw) ? fallback : raw, 1, 12);
-      if (isNaN(raw)) perRow.value = line;
-      return line;
-    }
-
-    function renderTeamCard(teamPlayers, title) {
-      const colWrap = el("div", "col-12 col-md-6");
-      const card = el("div", "card p-3 p-md-4 h-100");
-      card.appendChild(el("h3", "h6 team-title mb-3", title));
-
-      if (!teamPlayers || teamPlayers.length === 0) {
-        card.appendChild(el("div", "muted", "Sem sorteio ainda."));
-        colWrap.appendChild(card);
-        return colWrap;
-      }
-
-      const line = getPerRowValue(teamPlayers);
-      const col = Math.max(1, Math.floor(12 / line)) || 12;
-
-      const grid = el("div", "row g-2");
-      for (const p of teamPlayers) {
-        const c = el("div", `col-12 col-sm-${col}`);
-        const isGK = !!p.isGK;
-        const badgeClass = isGK
-          ? "badge-player badge text-bg-warning text-dark w-100 text-center"
-          : "badge-player badge text-bg-primary w-100 text-center";
-        c.appendChild(el("div", badgeClass, `${isGK ? "[GK] " : ""}${p.name}`));
-        grid.appendChild(c);
-      }
-
-      card.appendChild(grid);
-      colWrap.appendChild(card);
-      return colWrap;
-    }
-
-    function renderTeams(teams) {
-      teamsWrapper.innerHTML = "";
-      if (!teams || teams.length === 0) {
-        const empty = el("div", "col-12");
-        const card = el("div", "card p-3 p-md-4 h-100");
-        card.appendChild(el("h3", "h6 team-title mb-3", "Times"));
-        card.appendChild(el("div", "muted", "Sem sorteio ainda."));
-        empty.appendChild(card);
-        teamsWrapper.appendChild(empty);
-        return;
-      }
-
-      teams.forEach((team, idx) => {
-        const title = `Time ${idx + 1}`;
-        teamsWrapper.appendChild(renderTeamCard(team, title));
-      });
-    }
-
-    function chooseKickoff(teams, lineSize, requireGk) {
-      if (!teams || teams.length === 0) {
-        kickoffInfo.className = "muted";
-        kickoffInfo.textContent = "Sorteie os times para descobrir quem fica com a bola e quem escolhe campo.";
-        return;
-      }
-      const complete = teams
-        .map((t, idx) => ({ ...t, idx }))
-        .filter(t => t.line >= lineSize && (!requireGk || t.gk > 0));
-
-      if (complete.length === 0) {
-        kickoffInfo.className = "muted";
-        kickoffInfo.textContent = "Nenhum time completo para sortear inicio.";
-        return;
-      }
-
-      const idxBall = Math.floor(Math.random() * complete.length);
-      let idxField = Math.floor(Math.random() * complete.length);
-      if (complete.length > 1) {
-        while (idxField === idxBall) idxField = Math.floor(Math.random() * complete.length);
-      }
-      const ballTeam = `Time ${complete[idxBall].idx + 1}`;
-      const fieldTeam = `Time ${complete[idxField].idx + 1}`;
-      kickoffInfo.className = "";
-      kickoffInfo.innerHTML = `<b>${ballTeam}</b> comeca com a bola.<br><b>${fieldTeam}</b> escolhe lado/campo.`;
-    }
-
-    // ---------- Timer ----------
-    function formatMs(ms) {
-      const totalSeconds = Math.max(0, Math.floor(ms / 1000));
-      const m = String(Math.floor(totalSeconds / 60)).padStart(2, "0");
-      const s = String(totalSeconds % 60).padStart(2, "0");
-      return `${m}:${s}`;
-    }
-
-    function updateTimerDisplay() {
-      timerDisplay.textContent = formatMs(remainingMs);
-    }
-
-    function startTimer() {
-      stopBeepLoop();
-      if (timerId) clearInterval(timerId);
-
-      if (remainingMs <= 0) {
-        const minutes = Math.max(1, parseInt(timerMinutes.value || "0", 10));
-        timerMinutes.value = minutes;
-        remainingMs = minutes * 60 * 1000;
-      }
-
-      updateTimerDisplay();
-
-      timerId = setInterval(() => {
-        remainingMs -= 1000;
-        if (remainingMs <= 0) {
-          remainingMs = 0;
-          clearInterval(timerId);
-          timerId = null;
-          updateTimerDisplay();
-          startBeepLoop();
-          alert("Fim do tempo! Clique em Pausar ou Parar som para silenciar.");
-          return;
-        }
-        updateTimerDisplay();
-      }, 1000);
-    }
-
-    function pauseTimer() {
-      if (timerId) {
-        clearInterval(timerId);
-        timerId = null;
-      }
-      stopBeepLoop();
-    }
-
-    function resetTimer() {
-      pauseTimer();
-      const minutes = Math.max(1, parseInt(timerMinutes.value || "0", 10));
-      timerMinutes.value = minutes;
-      remainingMs = minutes * 60 * 1000;
-      updateTimerDisplay();
-    }
-
-    // ---------- Draw Logic ----------
-    function drawTeams() {
-      const lineSize = Math.max(1, parseInt(teamSize.value || "0", 10));
-      teamSize.value = lineSize;
-
-      const players = getPlayersFromFields();
-      if (players.length < 2) {
-        alert("Coloque pelo menos 2 nomes para sortear.");
-        return;
-      }
-
-      const keepers = shuffle(players.filter(p => p.isGK));
-      const field = shuffle(players.filter(p => !p.isGK));
-
-      const teams = [];
-      const createTeam = () => ({ players: [], gk: 0, line: 0 });
-      const addTeam = () => { teams.push(createTeam()); return teams[teams.length - 1]; };
-      addTeam(); addTeam(); // comeca com 2 times
-
-      const pushPlayer = (team, player) => {
-        team.players.push(player);
-        if (player.isGK) team.gk++;
-        else team.line++;
-      };
-
-      const assignKeeper = (player) => {
-        // tenta achar time sem goleiro, senao cria novo
-        let target = teams.find(t => t.gk === 0 && t.line < lineSize) || teams.find(t => t.gk === 0);
-        if (!target) target = addTeam();
-        pushPlayer(target, player);
-      };
-
-      const assignField = (player) => {
-        const candidates = teams.filter(t => t.line < lineSize);
-        let target = candidates.sort((a, b) => a.line - b.line)[0];
-        if (!target) target = addTeam();
-        pushPlayer(target, player);
-      };
-
-      const takeKeeper = () => keepers.length ? keepers.shift() : null;
-
-      // (Opcional) 1 goleiro nos dois primeiros times
-      if (oneKeeperEach.checked) {
-        const gk1 = takeKeeper();
-        if (gk1) assignKeeper(gk1);
-        const gk2 = takeKeeper();
-        if (gk2) assignKeeper(gk2);
-      }
-
-      // mistura o resto (goleiros restantes tambem entram no sorteio)
-      const rest = shuffle([...keepers, ...field]);
-
-      // Preenche times ate o limite de jogadores de linha. Se nao tiver espaco, cria novos times.
-      for (const p of rest) {
-        if (p.isGK) assignKeeper(p);
-        else assignField(p);
-      }
-
-      const finalTeams = teams.filter(t => t.players.length > 0);
-      renderTeams(finalTeams.map(t => t.players));
-      const requireGk = parseInt(totalKeepers.value || "0", 10) > 0;
-      chooseKickoff(finalTeams, lineSize, requireGk);
-      lastPlayersSnapshot = { teams: finalTeams.map(t => t.players) };
-    }
-
-    function copyTeamsToClipboard() {
-      if (!lastPlayersSnapshot) {
-        alert("Faca um sorteio antes de copiar.");
-        return;
-      }
-      const { teams } = lastPlayersSnapshot;
-      const fmt = (arr) => arr.map(p => `${p.isGK ? "[GK] " : ""}${p.name}`).join(", ") || "Nenhum";
-      const text = teams.map((t, i) => `Time ${i + 1}: ${fmt(t)}`).join("\n");
-
-      navigator.clipboard.writeText(text)
-        .then(() => alert("Times copiados!"))
-        .catch(() => alert("Nao consegui copiar automaticamente. (Seu navegador pode bloquear)."));
-    }
-
-    function copyTeamsPretty() {
-      if (!lastPlayersSnapshot) {
-        alert("Faca um sorteio antes de copiar.");
-        return;
-      }
-      const { teams } = lastPlayersSnapshot;
-      const blocks = teams.map((t, i) => {
-        const lines = t.map(p => `- ${p.isGK ? "[GK] " : ""}${p.name}`).join("\n") || "- Nenhum";
-        return `Time ${i + 1}\n${lines}`;
-      });
-      const text = blocks.join("\n\n");
-      navigator.clipboard.writeText(text)
-        .then(() => alert("Lista copiada!"))
-        .catch(() => alert("Nao consegui copiar automaticamente. (Seu navegador pode bloquear)."));
-    }
-
-    function resetAll() {
-      // limpa inputs mantendo quantidade
-      const inputs = playersContainer.querySelectorAll("input.form-control");
-      const checks = playersContainer.querySelectorAll("input.form-check-input");
-      inputs.forEach(i => i.value = "");
-      checks.forEach(c => c.checked = false);
-      lastPlayersSnapshot = null;
-      renderTeams([]);
-      kickoffInfo.className = "muted";
-      kickoffInfo.textContent = "Sorteie os times para descobrir quem fica com a bola e quem escolhe campo.";
-    }
-
-    // ---------- Events ----------
-    gameType.addEventListener("change", () => {
-      applyGamePreset();
-      renderPlayerFields();
+    btnLimpar.addEventListener("click", () => {
+      textoBrutoTextarea.value = "";
+      resultadoDiv.innerHTML = "";
+      contadorSobras.textContent = "Jogadores sobrando: 0";
+      goleirosProcessados = [];
+      jogadoresProcessados = [];
+      ultimoTextoCopiavel = "";
     });
-
-    btnGenerateFields.addEventListener("click", renderPlayerFields);
-    btnAutoMark.addEventListener("click", autoMarkKeepers);
-
-    btnDraw.addEventListener("click", drawTeams);
-    btnRedraw.addEventListener("click", drawTeams);
-
-    btnCopy.addEventListener("click", copyTeamsToClipboard);
-    btnCopyPretty.addEventListener("click", copyTeamsPretty);
-    btnResetAll.addEventListener("click", () => {
-      if (confirm("Quer limpar todos os nomes e resultados?")) resetAll();
-    });
-    btnToggleTheme.addEventListener("click", () => setTheme(currentTheme === "dark" ? "light" : "dark"));
-
-    btnTimerStart.addEventListener("click", startTimer);
-    btnTimerPause.addEventListener("click", pauseTimer);
-    btnTimerReset.addEventListener("click", resetTimer);
-    btnTimerMute.addEventListener("click", stopBeepLoop);
-
-    document.querySelectorAll("[data-score-btn]").forEach(btn => {
-      btn.addEventListener("click", () => {
-        const action = btn.getAttribute("data-score-btn");
-        const n1 = parseInt(scoreT1.textContent, 10);
-        const n2 = parseInt(scoreT2.textContent, 10);
-        if (action === "t1-inc") scoreT1.textContent = n1 + 1;
-        if (action === "t2-inc") scoreT2.textContent = n2 + 1;
-        if (action === "t1-dec") scoreT1.textContent = Math.max(0, n1 - 1);
-        if (action === "t2-dec") scoreT2.textContent = Math.max(0, n2 - 1);
-        if (action === "reset") { scoreT1.textContent = 0; scoreT2.textContent = 0; }
-      });
-    });
-
-    // inicia com campos prontos
-    applyGamePreset();
-    renderPlayerFields();
-    resetTimer();
-    setTheme(currentTheme);
-    if (window.lucide) window.lucide.createIcons();
   </script>
 </body>
 </html>
