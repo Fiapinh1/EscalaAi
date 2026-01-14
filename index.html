@@ -118,6 +118,64 @@
       gap: 4px;
     }
 
+    .mode-toggle {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 6px;
+    }
+
+    .btn-toggle {
+      min-width: 120px;
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid #263238;
+      background: #1c2331;
+      color: #cfd8dc;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .btn-toggle.active {
+      border-color: #00e676;
+      color: #e4fff2;
+      box-shadow: 0 0 0 1px rgba(0,230,118,0.15);
+    }
+
+    .textarea-ghost {
+      background: #12182c;
+      border: 1px dashed #263238;
+      color: #eceff1;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .manual-inline {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .manual-inline input {
+      flex: 2;
+      min-width: 180px;
+    }
+
+    .manual-inline select {
+      flex: 1;
+      min-width: 120px;
+    }
+
+    .hint {
+      margin-top: 6px;
+      font-size: 0.82rem;
+      color: #90a4ae;
+    }
+
     .times-container {
       margin-top: 16px;
       display: flex;
@@ -146,8 +204,13 @@
     }
 
     .time-card li::before {
-      content: "• ";
-      color: #90caf9;
+      content: "⚽ ";
+      color: #64b5f6;
+    }
+
+    .time-card li.goleiro::before {
+      content: "🧤 ";
+      color: #ffca28;
     }
 
     .badge {
@@ -158,6 +221,18 @@
       background: #263238;
       color: #fff;
       margin-left: 5px;
+    }
+
+    .tag-gol {
+      display: inline-block;
+      margin-left: 6px;
+      padding: 2px 6px;
+      border-radius: 12px;
+      background: rgba(255, 202, 40, 0.15);
+      color: #ffca28;
+      font-size: 0.75rem;
+      font-weight: bold;
+      border: 1px solid rgba(255, 202, 40, 0.35);
     }
 
     .footer-info {
@@ -211,6 +286,17 @@
     </div>
     <div class="row">
       <div class="col">
+        <div class="mode-toggle">
+          <span>Como quer adicionar?</span>
+          <div class="btn-group" style="gap:6px;">
+            <button id="btnModoLista" class="btn-toggle active" type="button">Colar lista</button>
+            <button id="btnModoManual" class="btn-toggle" type="button">Adicionar manual</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row" id="blocoLista">
+      <div class="col">
         <label for="textoBruto">Texto completo da lista (cole a mensagem do grupo aqui)</label>
         <textarea id="textoBruto" placeholder="Cole aqui a mensagem com:
 GOLEIROS
@@ -232,7 +318,40 @@ LISTA DE ESPERA
           </button>
           <button id="btnLimpar" class="btn-secondary">Limpar</button>
         </div>
-        <p id="contadorSobras">Jogadores sobrando: 0</p>
+      </div>
+    </div>
+    <div class="row" id="blocoManual">
+      <div class="col">
+        <label for="manualNome">Adicionar manualmente</label>
+        <div class="manual-inline">
+          <input id="manualNome" type="text" placeholder="Nome do jogador" />
+          <select id="manualTipo">
+            <option value="goleiro">Goleiro (GOL)</option>
+            <option value="jogador" selected>Jogador de linha</option>
+          </select>
+          <button id="btnAddManual" class="btn-secondary">Adicionar</button>
+        </div>
+        <p id="contagemAtual" class="hint">Goleiros: 0 | Jogadores: 0</p>
+      </div>
+    </div>
+    <div class="row" id="blocoCorrigir">
+      <div class="col">
+        <label for="corrigeNome">Corrigir jogador (mover entre goleiro/linha)</label>
+        <div class="manual-inline">
+          <input id="corrigeNome" type="text" placeholder="Nome já adicionado" />
+          <select id="corrigeTipo">
+            <option value="goleiro">Mover para Goleiro</option>
+            <option value="jogador">Mover para Jogador de linha</option>
+          </select>
+          <button id="btnMoverTipo" class="btn-outline">Mover</button>
+        </div>
+        <p class="hint">Use quando adicionou no lugar errado: informe o nome e escolha o destino.</p>
+      </div>
+    </div>
+    <div class="row" id="blocoPreview">
+      <div class="col">
+        <label for="previewLista">Prévia dos nomes adicionados</label>
+        <textarea id="previewLista" class="textarea-ghost" readonly rows="6" placeholder="Nenhum nome adicionado ainda."></textarea>
       </div>
     </div>
     <div id="resultado" class="times-container"></div>
@@ -267,17 +386,31 @@ LISTA DE ESPERA
     const modalidadeSelect = document.getElementById("modalidade");
     const jogadoresPorTimeInput = document.getElementById("jogadoresPorTime");
     const textoBrutoTextarea = document.getElementById("textoBruto");
+    const btnModoLista = document.getElementById("btnModoLista");
+    const btnModoManual = document.getElementById("btnModoManual");
     const btnProcessar = document.getElementById("btnProcessar");
     const btnSortear = document.getElementById("btnSortear");
     const btnLimpar = document.getElementById("btnLimpar");
     const btnCopiar = document.getElementById("btnCopiar");
     const btnModelo = document.getElementById("btnModelo");
+    const manualNomeInput = document.getElementById("manualNome");
+    const manualTipoSelect = document.getElementById("manualTipo");
+    const btnAddManual = document.getElementById("btnAddManual");
+    const corrigeNomeInput = document.getElementById("corrigeNome");
+    const corrigeTipoSelect = document.getElementById("corrigeTipo");
+    const btnMoverTipo = document.getElementById("btnMoverTipo");
     const resultadoDiv = document.getElementById("resultado");
-    const contadorSobras = document.getElementById("contadorSobras");
+    const contagemAtual = document.getElementById("contagemAtual");
+    const previewLista = document.getElementById("previewLista");
+    const blocoLista = document.getElementById("blocoLista");
+    const blocoManual = document.getElementById("blocoManual");
+    const blocoCorrigir = document.getElementById("blocoCorrigir");
+    const blocoPreview = document.getElementById("blocoPreview");
 
     let goleirosProcessados = [];
     let jogadoresProcessados = [];
     let ultimoTextoCopiavel = "";
+    let modoEntrada = "lista"; // lista | manual
 
     const MODELO_LISTA = `✅ LISTA DOS CONFIRMADOS
 Dia XX/XX/XXXX
@@ -391,11 +524,13 @@ LISTA DE ESPERA
       jogadoresProcessados = jogadores;
 
       mostrarNotificacao(
-        'Processado!<br>Goleiros: ' +
+        'Processado! Goleiros: ' +
         goleirosProcessados.length +
-        '<br>Jogadores de linha: ' +
+        ' Jogadores: ' +
         jogadoresProcessados.length
       );
+      atualizarContagem();
+      atualizarPreviewLista();
     }
 
     function sortearTimes() {
@@ -435,32 +570,44 @@ LISTA DE ESPERA
         }
       }
 
-      let sobrando = jogadores.length - iJog;
-      if (sobrando < 0) sobrando = 0;
-      contadorSobras.textContent = "Jogadores sobrando: " + sobrando;
-
-      let texto = "";
+      const tituloSorteio = "*GOLEIO* (Sorteio)";
+      let texto = `${tituloSorteio}\n\n`;
       resultadoDiv.innerHTML = "";
       times.forEach((time, index) => {
         if (time.length === 0) return;
 
         const nomeTime = `Time ${index + 1}`;
-        texto += nomeTime + " (" + time.length + " jogadores):\n";
+        texto += `🏆 **${nomeTime}** (${time.length} jogadores):\n`;
         const card = document.createElement("div");
         card.className = "time-card";
 
         const titulo = document.createElement("h3");
-        titulo.textContent = nomeTime;
+        titulo.innerHTML = `🏆 <strong>${nomeTime}</strong>`;
         const badge = document.createElement("span");
         badge.className = "badge";
-        badge.textContent = `${time.length} jogadores`;
+        badge.textContent = `👥 ${time.length} jogadores`;
         titulo.appendChild(badge);
 
         const lista = document.createElement("ul");
         time.forEach(j => {
-          texto += " - " + j + "\n";
+          const isGoleiro = j.toUpperCase().includes("(GOL)");
+          const nomeLimpo = j.replace(/\s*\(GOL\)/i, "").trim();
+          const emoji = isGoleiro ? "🧤" : "⚽";
+          texto += ` - ${emoji} ${nomeLimpo}${isGoleiro ? " (GOL)" : ""}\n`;
+
           const li = document.createElement("li");
-          li.textContent = j;
+          if (isGoleiro) {
+            li.classList.add("goleiro");
+            const nomeSpan = document.createElement("span");
+            nomeSpan.textContent = nomeLimpo;
+            const tag = document.createElement("span");
+            tag.className = "tag-gol";
+            tag.textContent = "🧤 GOL";
+            li.appendChild(nomeSpan);
+            li.appendChild(tag);
+          } else {
+            li.textContent = nomeLimpo;
+          }
           lista.appendChild(li);
         });
         texto += "\n";
@@ -470,11 +617,110 @@ LISTA DE ESPERA
         resultadoDiv.appendChild(card);
       });
 
-      if (sobrando > 0) {
-        texto += `Jogadores sobrando: ${sobrando}\n`;
+      ultimoTextoCopiavel = texto.trim();
+    }
+
+    function atualizarContagem() {
+      contagemAtual.textContent =
+        `Goleiros: ${goleirosProcessados.length} | Jogadores: ${jogadoresProcessados.length}`;
+    }
+
+    function atualizarPreviewLista() {
+      if (goleirosProcessados.length === 0 && jogadoresProcessados.length === 0) {
+        previewLista.value = "Nenhum nome adicionado ainda.";
+        return;
+      }
+      const linhas = [];
+      linhas.push("GOLEIROS:");
+      if (goleirosProcessados.length === 0) {
+        linhas.push("- (nenhum goleiro)");
+      } else {
+        goleirosProcessados.forEach(n => linhas.push(`- 🧤 ${n}`));
+      }
+      linhas.push("");
+      linhas.push("JOGADORES:");
+      if (jogadoresProcessados.length === 0) {
+        linhas.push("- (nenhum jogador de linha)");
+      } else {
+        jogadoresProcessados.forEach(n => linhas.push(`- ⚽ ${n}`));
+      }
+      previewLista.value = linhas.join("\n");
+    }
+
+    function alternarModo(modo) {
+      modoEntrada = modo;
+      btnModoLista.classList.toggle("active", modo === "lista");
+      btnModoManual.classList.toggle("active", modo === "manual");
+      const isManual = modo === "manual";
+      textoBrutoTextarea.disabled = isManual;
+      textoBrutoTextarea.placeholder = isManual
+        ? "Modo manual ativo. Adicione nomes pelo formulário abaixo."
+        : "Cole aqui a mensagem com:\nGOLEIROS\nATLETAS DE ALTO NÍVEL\nLISTA DE ESPERA\n";
+      blocoLista.classList.toggle("hidden", isManual);
+      blocoManual.classList.toggle("hidden", !isManual);
+      blocoCorrigir.classList.toggle("hidden", !isManual);
+      blocoPreview.classList.toggle("hidden", !isManual);
+      btnProcessar.classList.toggle("hidden", isManual);
+      btnModelo.classList.toggle("hidden", isManual);
+    }
+
+    function adicionarManual() {
+      const nome = manualNomeInput.value.trim();
+      const tipo = manualTipoSelect.value;
+      if (!nome) {
+        mostrarNotificacao('Digite um nome para adicionar.');
+        return;
       }
 
-      ultimoTextoCopiavel = texto.trim();
+      if (tipo === "goleiro") {
+        goleirosProcessados.push(nome);
+      } else {
+        jogadoresProcessados.push(nome);
+      }
+
+      manualNomeInput.value = "";
+      atualizarContagem();
+      atualizarPreviewLista();
+      mostrarNotificacao(`${nome} adicionado como ${tipo === "goleiro" ? "goleiro" : "jogador"}.`);
+    }
+
+    function moverJogador() {
+      const nome = corrigeNomeInput.value.trim();
+      const destino = corrigeTipoSelect.value; // goleiro ou jogador
+      if (!nome) {
+        mostrarNotificacao('Informe o nome para corrigir.');
+        return;
+      }
+
+      const nomeLower = nome.toLowerCase();
+      const idxGol = goleirosProcessados.findIndex(n => n.toLowerCase() === nomeLower);
+      const idxJog = jogadoresProcessados.findIndex(n => n.toLowerCase() === nomeLower);
+
+      if (idxGol === -1 && idxJog === -1) {
+        mostrarNotificacao('Nome não encontrado na lista atual.');
+        return;
+      }
+
+      // Se já está no destino, apenas avisa
+      if ((destino === "goleiro" && idxGol !== -1 && idxJog === -1) ||
+          (destino === "jogador" && idxJog !== -1 && idxGol === -1)) {
+        mostrarNotificacao('Esse nome já está no tipo escolhido.');
+        return;
+      }
+
+      if (idxGol !== -1) goleirosProcessados.splice(idxGol, 1);
+      if (idxJog !== -1) jogadoresProcessados.splice(idxJog, 1);
+
+      if (destino === "goleiro") {
+        goleirosProcessados.push(nome);
+      } else {
+        jogadoresProcessados.push(nome);
+      }
+
+      corrigeNomeInput.value = "";
+      atualizarContagem();
+      atualizarPreviewLista();
+      mostrarNotificacao(`Movido para ${destino === "goleiro" ? "GOLEIRO" : "JOGADOR"}.`);
     }
 
     async function copiarTimes() {
@@ -505,15 +751,24 @@ LISTA DE ESPERA
     btnSortear.addEventListener("click", sortearTimes);
     btnCopiar.addEventListener("click", copiarTimes);
     btnModelo.addEventListener("click", copiarModeloLista);
+    btnAddManual.addEventListener("click", adicionarManual);
+    btnMoverTipo.addEventListener("click", moverJogador);
+    btnModoLista.addEventListener("click", () => alternarModo("lista"));
+    btnModoManual.addEventListener("click", () => alternarModo("manual"));
 
     btnLimpar.addEventListener("click", () => {
       textoBrutoTextarea.value = "";
       resultadoDiv.innerHTML = "";
-      contadorSobras.textContent = "Jogadores sobrando: 0";
       goleirosProcessados = [];
       jogadoresProcessados = [];
       ultimoTextoCopiavel = "";
+      atualizarContagem();
+      atualizarPreviewLista();
     });
+
+    atualizarContagem();
+    atualizarPreviewLista();
+    alternarModo("lista");
   </script>
 </body>
 </html>
